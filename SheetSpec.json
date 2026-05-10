@@ -1,0 +1,254 @@
+[
+  {
+    "Column": "A",
+    "Name": "ID",
+    "Type": "String",
+    "Explanation": "Unique identifier for the row",
+    "Example": "row_12345"
+  },
+  {
+    "Column": "B",
+    "Name": "Date",
+    "Type": "Date",
+    "Explanation": "Date of the race (format DD/MM/YYYY)",
+    "Example": "29/12/2025"
+  },
+  {
+    "Column": "C",
+    "Name": "Racecourse",
+    "Type": "String",
+    "Explanation": "Name of the racecourse",
+    "Example": "Doncaster"
+  },
+  {
+    "Column": "D",
+    "Name": "Time",
+    "Type": "String",
+    "Explanation": "Time of the race (format HH:MM)",
+    "Example": "13:00"
+  },
+  {
+    "Column": "E",
+    "Name": "Horse",
+    "Type": "String",
+    "Explanation": "Name of the horse",
+    "Example": "Get on George"
+  },
+  {
+    "Column": "F",
+    "Name": "Tipster",
+    "Type": "String",
+    "Explanation": "Short code for the tipster, e.g. TOF for 'Turn of Foot'",
+    "Example": "TOF"
+  },
+  {
+    "Column": "G",
+    "Name": "Stake",
+    "Type": "Double",
+    "Explanation": "Number of points to place per leg of the bet, e.g. 0.5pt e/w or 1pt win",
+    "Example": "0.50"
+  },
+  {
+    "Column": "H",
+    "Name": "Bet Type",
+    "Type": "String",
+    "Explanation": "Either Win or E/W",
+    "Example": "E/W"
+  },
+  {
+    "Column": "I",
+    "Name": "AdvOdds",
+    "Type": "String",
+    "Explanation": "Odds advised by the tipster",
+    "Example": "7/1"
+  },
+  {
+    "Column": "J",
+    "Name": "AdvPlc",
+    "Type": "String",
+    "Explanation": "Number of places advised by the tipster. Only applicable for E/W bets. Blank implies to take the default.",
+    "Example": "4"
+  },
+  {
+    "Column": "K",
+    "Name": "Bookmaker",
+    "Type": "String",
+    "Explanation": "Name of the bookmaker",
+    "Example": "Ladbrokes"
+  },
+  {
+    "Column": "L",
+    "Name": "Taken",
+    "Type": "String",
+    "Explanation": "Odds taken with the bookmaker",
+    "Example": "8/1"
+  },
+  {
+    "Column": "M",
+    "Name": "BOG?",
+    "Type": "String",
+    "Explanation": "Was the bookmaker offering 'Best Odds Guaranteed' on the bet?",
+    "Example": "No"
+  },
+  {
+    "Column": "N",
+    "Name": "PlcPaid",
+    "Type": "String",
+    "Explanation": "Number of places paid by the bookmaker. Only applicable for E/W bets.",
+    "Example": "3"
+  },
+  {
+    "Column": "O",
+    "Name": "PlcFraction",
+    "Type": "String",
+    "Explanation": "Fraction of odds paid by the bookmaker for a place. Only applicable for E/W bets.",
+    "Example": "1/4"
+  },
+  {
+    "Column": "P",
+    "Name": "Pt (£)",
+    "Type": "Double",
+    "Explanation": "Amount in GBP to equate to 1 point",
+    "Example": "£10.00"
+  },
+  {
+    "Column": "Q",
+    "Name": "Status",
+    "Type": "String",
+    "Explanation": "A bet is 'Open' initially. Once the race has been run the result can be 'Won', 'Placed', 'Lost' or 'Void'",
+    "Example": "Won"
+  },
+  {
+    "Column": "R",
+    "Name": "Position",
+    "Type": "String",
+    "Explanation": "Numeric position if the horse finished. Otherwise PU, F, UR, BD, RO, NR",
+    "Example": "1"
+  },
+  {
+    "Column": "S",
+    "Name": "SP",
+    "Type": "String",
+    "Explanation": "Starting Price (Odds) for the horse",
+    "Example": "15/2"
+  },
+  {
+    "Column": "T",
+    "Name": "R4 %",
+    "Type": "Int",
+    "Explanation": "Rule 4 deduction (if applicable). This is the number of pence in the pound.",
+    "Example": "10"
+  },
+  {
+    "Column": "U",
+    "Name": "Year",
+    "Type": "formula",
+    "Explanation": "=YEAR(B2)",
+    "Example": "2025"
+  },
+  {
+    "Column": "V",
+    "Name": "Month",
+    "Type": "formula",
+    "Explanation": "=MONTH(B2)",
+    "Example": "12"
+  },
+  {
+    "Column": "W",
+    "Name": "DO",
+    "Type": "formula",
+    "Explanation": "=IF($L2=\"\",\"\",INT(LEFT($L2,FIND(\"/\",$L2)-1))/INT(RIGHT($L2,LEN($L2)-FIND(\"/\",$L2)))+1)",
+    "Example": "9.0"
+  },
+  {
+    "Column": "X",
+    "Name": "DO (BOG)",
+    "Type": "formula",
+    "Explanation": "=IF(OR($M2<>\"Yes\",$S2=\"-\",$S2=\"\"),\"\",1+INT(LEFT($S2,FIND(\"/\",$S2)-1))/INT(RIGHT($S2,LEN($S2)-FIND(\"/\",$S2))))",
+    "Example": ""
+  },
+  {
+    "Column": "Y",
+    "Name": "DO (W)",
+    "Type": "formula",
+    "Explanation": "=IF($M2<>\"Yes\",$W2,$X2)",
+    "Example": "9.0"
+  },
+  {
+    "Column": "Z",
+    "Name": "PlcFr",
+    "Type": "formula",
+    "Explanation": "=IF(OR($O2=\"\",$O2=\"-\"),\"\",INT(LEFT($O2,FIND(\"/\",$O2)-1))/INT(RIGHT($O2,LEN($O2)-FIND(\"/\",$O2))))",
+    "Example": "0.25"
+  },
+  {
+    "Column": "AA",
+    "Name": "DO (P)",
+    "Type": "formula",
+    "Explanation": "=IF($H2<>\"E/W\",0,1+(($Y2-1)*$Z2))",
+    "Example": "3.00"
+  },
+  {
+    "Column": "AB",
+    "Name": "TotalStake (Pts)",
+    "Type": "formula",
+    "Explanation": "=IF(OR($Q2=\"Open\",$Q2=\"Draft\"),\"\",$G2+IF($H2=\"E/W\",$G2,0))",
+    "Example": "1.00"
+  },
+  {
+    "Column": "AC",
+    "Name": "TotalStake (£)",
+    "Type": "formula",
+    "Explanation": "=$AB2*$P2",
+    "Example": "£10.00"
+  },
+  {
+    "Column": "AD",
+    "Name": "Ret (WL)",
+    "Type": "formula",
+    "Explanation": "=IF(OR($Q2=\"Open\",$Q2=\"Draft\"),\"\",IF($Q2<>\"Won\",0,$G2*(1+($Y2-1)*IF($T2=\"\",1,1-($T2/100)))))",
+    "Example": "4.500"
+  },
+  {
+    "Column": "AE",
+    "Name": "Ret (PL)",
+    "Type": "formula",
+    "Explanation": "=IF(OR($Q2=\"Open\",$Q2=\"Draft\"),\"\",IF(OR($AA2<=0,$Q2=\"Lost\"),0,$G2*(1+($AA2-1)*IF($T2=\"\",1,1-($T2/100)))))",
+    "Example": "1.500"
+  },
+  {
+    "Column": "AF",
+    "Name": "Returns (Pts)",
+    "Type": "formula",
+    "Explanation": "=$AD2+$AE2",
+    "Example": "6.000"
+  },
+  {
+    "Column": "AG",
+    "Name": "Profit (Pts)",
+    "Type": "formula",
+    "Explanation": "=$AF2-$AB2",
+    "Example": "5.000"
+  },
+  {
+    "Column": "AH",
+    "Name": "Returns (£)",
+    "Type": "formula",
+    "Explanation": "=$AF2*$P2",
+    "Example": "£60.00"
+  },
+  {
+    "Column": "AI",
+    "Name": "Profit (£)",
+    "Type": "formula",
+    "Explanation": "=$AG2*$P2",
+    "Example": "£50.00"
+  },
+  {
+    "Column": "AJ",
+    "Name": "Comment",
+    "Type": "String",
+    "Explanation": "Optional text to explain why there may be manual amendments on the calculated numbers",
+    "Example": "Free bet"
+  }
+]

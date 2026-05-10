@@ -1,3 +1,9 @@
+# Project specific exclusions
+service_account.json
+confidential.py
+test_samples/
+draft_bets/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
