@@ -3,6 +3,8 @@ service_account.json
 confidential.py
 test_samples/
 draft_bets/
+placed_bets/
+missed_bets/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,9 +1,18 @@
+from dotenv import load_dotenv
+load_dotenv()  # This looks for a .env file and loads it into os.environ
+
+import os
+import json
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException
+from typing import List, Optional
 from schemas import DraftBet, OpenBetUpdate, SettleBet
-from sheets import get_user_sheet, insert_draft_row, update_to_open, settle_bet_row
-from confidential import USER_SHEETS
+from sheets import get_user_sheet, insert_draft_row, update_to_open, settle_bet_row, get_filtered_bets
 
 app = FastAPI()
+
+# Load user mapping from environment: e.g. '{"token123": "sheet_id_A", "token456": "sheet_id_B"}'
+USER_SHEETS_JSON = os.environ.get("USER_SHEETS_CONFIG", "{}")
+USER_SHEETS = json.loads(USER_SHEETS_JSON)
 
 # USER_SHEETS contains sensitive mappings of user tokens to their Google Sheet IDs.
 # The definition looks like this:
@@ -54,3 +63,17 @@ async def settle_bet(settle: SettleBet, x_token: str = Header(None)):
         raise HTTPException(status_code=404, detail=message)
         
     return {"status": "success", "message": message}
+
+@app.get("/bets", response_model=List[dict])
+def get_bets(
+    status: Optional[str] = None, 
+    tipster: Optional[str] = None, 
+    x_token: str = Header(None)
+):
+    sheet_id = USER_SHEETS.get(x_token)
+    if not sheet_id:
+        raise HTTPException(status_code=401, detail="Invalid User Token")
+    
+    sh = get_user_sheet(sheet_id)
+    # We'll build this function next
+    return get_filtered_bets(sh, status, tipster)

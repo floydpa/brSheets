@@ -2,3 +2,5 @@ fastapi[standard]
 gspread
 gspread-formatting
 requests
+python-dotenv
+gunicorn

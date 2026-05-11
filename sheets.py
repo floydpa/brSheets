@@ -1,3 +1,5 @@
+import os
+import json
 import gspread
 from gspread_formatting import get_user_entered_format, format_cell_range
 from gspread_formatting import CellFormat, Color
@@ -13,8 +15,17 @@ CALC_BLUE = Color(207/255, 226/255, 243/255) # #cfe2f3
 GREEN = Color(0, 1, 0)       # #00ff00
 RED = Color(234/255, 67/255, 53/255) # #ea4335
 
-# Auth setup
-gc = gspread.service_account(filename='service_account.json')
+# Auth setup for Google Sheets API using gspread.
+# Fetch the JSON string from environment variables
+creds_json = os.environ.get("GOOGLE_CREDS_JSON")
+
+if creds_json:
+    # If running on Railway/Server, use the environment variable
+    creds_dict = json.loads(creds_json)
+    gc = gspread.service_account_from_dict(creds_dict)
+else:
+    # Fallback to local file for development
+    gc = gspread.service_account(filename='service_account.json')
 
 def get_user_sheet(sheet_id):
     return gc.open_by_key(sheet_id)
@@ -201,3 +212,34 @@ def settle_bet_row(sh, settle: dict):
         format_cell_range(ws, f"AF{row_idx}:AI{row_idx}", CellFormat(backgroundColor=GREEN))
         
     return True, "Settled with visual highlights"
+
+# The headers corresponding to columns U through AE
+EXCLUDED_COLUMNS = {
+    "Year", "Month", "DO", "DO (BOG)", "DO (W)", 
+    "PlcFr", "DO (P)", "TotalStake (Pts)", 
+    "TotalStake (£)", "Ret (WL)", "Ret (PL)"
+}
+
+def get_filtered_bets(sh, status_filter=None, tipster_filter=None):
+    ws = sh.worksheet("Transactions")
+    all_records = ws.get_all_records()
+    
+    filtered_results = []
+    for record in all_records:
+        # 1. Apply Filters
+        if status_filter and record.get("Status") != status_filter:
+            continue
+        if tipster_filter and record.get("Tipster") != tipster_filter:
+            continue
+            
+        # 2. Strip "Hidden" Calculation Keys
+        # We use a dictionary comprehension to build a new record 
+        # that only includes keys NOT in our exclusion list
+        clean_record = {
+            k: v for k, v in record.items() 
+            if k not in EXCLUDED_COLUMNS
+        }
+        
+        filtered_results.append(clean_record)
+        
+    return filtered_results
