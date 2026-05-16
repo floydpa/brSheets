@@ -1,10 +1,13 @@
 # Project specific exclusions
 service_account.json
+br_sheets_session.session
 confidential.py
 test_samples/
 draft_bets/
-placed_bets/
-missed_bets/
+bet_placings/
+setup/data/
+session_name.session
+br_sheets.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

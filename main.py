@@ -8,7 +8,9 @@ from typing import List, Optional
 from schemas import DraftBet, OpenBetUpdate, SettleBet
 from sheets import get_user_sheet, insert_draft_row, update_to_open, settle_bet_row, get_filtered_bets
 
-app = FastAPI()
+from database import SessionLocal, init_db, TipDetail, TipMessage
+from sqlalchemy.orm import Session
+from fastapi import Depends
 
 # Load user mapping from environment: e.g. '{"token123": "sheet_id_A", "token456": "sheet_id_B"}'
 USER_SHEETS_JSON = os.environ.get("USER_SHEETS_CONFIG", "{}")
@@ -20,6 +22,20 @@ USER_SHEETS = json.loads(USER_SHEETS_JSON)
 #    "secret_token_1": "Google Sheet ID for User 1",
 #    "secret_token_2": "Google Sheet ID for User 2"
 #}
+
+app = FastAPI()
+
+# Initialize DB (creates the .db file and tables if they don't exist)
+init_db()
+
+# Dependency to get DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 @app.post("/bet/draft")
 async def create_draft(bet: DraftBet, background_tasks: BackgroundTasks, x_token: str = Header(None)):
@@ -77,3 +93,16 @@ def get_bets(
     sh = get_user_sheet(sheet_id)
     # We'll build this function next
     return get_filtered_bets(sh, status, tipster)
+
+@app.get("/tips")
+def list_tips(db: Session = Depends(get_db)):
+    # Returns all parsed tips, joining with the parent message to get 'arrived_at'
+    tips = db.query(TipDetail).all()
+    return tips
+
+@app.get("/tips/{msg_id}")
+def get_tip_by_msg(msg_id: int, db: Session = Depends(get_db)):
+    tip = db.query(TipMessage).filter(TipMessage.msg_id == msg_id).first()
+    if not tip:
+        raise HTTPException(status_code=404, detail="Message not found")
+    return tip

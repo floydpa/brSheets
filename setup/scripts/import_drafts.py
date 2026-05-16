@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import requests
 from confidential import HEADERS
@@ -29,6 +30,8 @@ def import_drafts():
         # Send to your FastAPI server
         response = requests.post(API_URL, json=data, headers=HEADERS)
         
+        time.sleep(5)  # Sleep to avoid overwhelming the server
+
         if response.status_code == 200:
             print(f"✅ Imported: {filename} (ID: {data.get('ID')})")
         else:
