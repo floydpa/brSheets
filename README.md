@@ -15,3 +15,11 @@ Start the FastAPI service if not already running (fastapi dev main.py)
 Check FastAPI service is running (http://127.0.0.1:8000/docs)
 From the terminal run:
     python import_drafts.py
+
+Racing Post data
+----------------
+Note that the 'rpscrape' subdirectrory has been created from the 'rpscrape' project on github
+    git clone https://github.com/joenano/rpscrape.git
+This is used to collect race results including the SP.
+It's possible to extract a huge amount of data, but I've simplified it to just position, horse and SP.
+
