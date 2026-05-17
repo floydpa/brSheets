@@ -3,6 +3,7 @@ load_dotenv()  # This looks for a .env file and loads it into os.environ
 
 import os
 import json
+import re
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException
 from typing import List, Optional
 from schemas import DraftBet, OpenBetUpdate, SettleBet
@@ -11,6 +12,10 @@ from sheets import get_user_sheet, insert_draft_row, update_to_open, settle_bet_
 from database import SessionLocal, init_db, TipDetail, TipMessage
 from sqlalchemy.orm import Session
 from fastapi import Depends
+
+from fastapi import Path as FastPath
+import rp_scraper
+
 
 # Load user mapping from environment: e.g. '{"token123": "sheet_id_A", "token456": "sheet_id_B"}'
 USER_SHEETS_JSON = os.environ.get("USER_SHEETS_CONFIG", "{}")
@@ -106,3 +111,23 @@ def get_tip_by_msg(msg_id: int, db: Session = Depends(get_db)):
     if not tip:
         raise HTTPException(status_code=404, detail="Message not found")
     return tip
+
+@app.get("/results/{date}/{course}/{time}")
+async def get_racing_post_results(
+    date: str = FastPath(..., description="Date formatted as DD-MM-YYYY"),
+    course: str = FastPath(..., description="Name of the course, e.g., York"),
+    time: str = FastPath(..., description="Race off-time in 24h format HH:MM")
+):
+    # Regex validate date parameter to head off bad input loops early
+    if not re.match(r"^\d{2}-\d{2}-\d{4}$", date):
+        raise HTTPException(status_code=400, detail="Invalid date layout format. Must be DD-MM-YYYY.")
+        
+    if not re.match(r"^\d{2}:\d{2}$", time):
+        raise HTTPException(status_code=400, detail="Invalid time layout format. Must be HH:MM.")
+
+    result_payload = await rp_scraper.fetch_race_results(date, course, time)
+    
+    if result_payload["status"] == "error":
+        raise HTTPException(status_code=404, detail=result_payload["message"])
+        
+    return result_payload["data"]
