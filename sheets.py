@@ -2,7 +2,7 @@ import os
 import json
 import gspread
 from gspread_formatting import get_user_entered_format, format_cell_range
-from gspread_formatting import CellFormat, Color
+from gspread_formatting import CellFormat, TextFormat, Color
 import threading
 
 # Create a global lock
@@ -14,6 +14,16 @@ CALC_BLUE = Color(207/255, 226/255, 243/255) # #cfe2f3
 # Colours for highlighting
 GREEN = Color(0, 1, 0)       # #00ff00
 RED = Color(234/255, 67/255, 53/255) # #ea4335
+
+# Dark Blue 1 (#1155cc) normalized to 0-1 values for Google API
+DARK_BLUE = Color(17/255, 85/255, 204/255)
+# Style configuration for overridden formulas: Dark blue text and italicized
+AMENDED_FORMAT = CellFormat(
+    textFormat=TextFormat(
+        foregroundColor=DARK_BLUE,
+        italic=True
+    )
+)
 
 # Auth setup for Google Sheets API using gspread.
 # Fetch the JSON string from environment variables
@@ -243,3 +253,60 @@ def get_filtered_bets(sh, status_filter=None, tipster_filter=None):
         filtered_results.append(clean_record)
         
     return filtered_results
+
+def amend_bet_row(sh, updates: dict) -> tuple[bool, str]:
+    ws = sh.worksheet("Transactions")
+    ids = ws.col_values(1)
+    
+    try:
+        row_idx = ids.index(updates['ID']) + 1
+    except ValueError:
+        return False, "ID not found"
+
+    column_mapping = {
+        "raceDate": "B",
+        "stakePts": "G",
+        "gbpPerPoint": "P",
+        "rule4": "T",
+        "returnsPts": "AF",
+        "profitPts": "AG",
+        "returnsGbp": "AH",
+        "profitGbp": "AI",
+        "comment": "AJ"
+    }
+
+    batch_payload = []
+    overwritten_calc_columns = [] # Keep track of overridden calculation columns
+    
+    # Check if we are overwriting calculated fields
+    for k in ["returnsPts", "profitPts", "returnsGbp", "profitGbp"]:
+        if updates.get(k) is not None:
+            overwritten_calc_columns.append(column_mapping[k])
+    
+    if overwritten_calc_columns and not updates.get("comment"):
+        return False, "A comment is required when overwriting calculated profit or return columns."
+
+    for key, column_letter in column_mapping.items():
+        value = updates.get(key)
+        if value is not None:
+            if key == "rule4" and value == 0:
+                value = ""
+                
+            batch_payload.append({
+                "range": f"{column_letter}{row_idx}",
+                "values": [[value]]
+            })
+
+    if not batch_payload:
+        return False, "No valid update parameters were passed."
+
+    # 1. Commit the data updates
+    ws.batch_update(batch_payload, value_input_option='USER_ENTERED')
+    
+    # 2. Apply formatting to overridden calculation cells
+    if overwritten_calc_columns:
+        for col_letter in overwritten_calc_columns:
+            # Applies dark blue text color and sets font style to italic
+            format_cell_range(ws, f"{col_letter}{row_idx}", AMENDED_FORMAT)
+
+    return True, f"Successfully updated {len(batch_payload)} fields on row {row_idx}."

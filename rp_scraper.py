@@ -31,7 +31,7 @@ def clean_sp_odds(sp_str: str) -> str:
     if not sp_str: return ""
     return re.sub(r"[A-Za-z]+$", "", sp_str.strip())
 
-def lookup_racing_post_course_id(target_name: str) -> str or None:
+def lookup_racing_post_course_id(target_name: str):
     """Dynamically loads the _courses file and performs smart matching."""
     if not COURSES_JSON_FILE.exists():
         print(f"Error: Course layout map missing at {COURSES_JSON_FILE}")

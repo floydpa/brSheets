@@ -6,8 +6,9 @@ import json
 import re
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException
 from typing import List, Optional
-from schemas import DraftBet, OpenBetUpdate, SettleBet
-from sheets import get_user_sheet, insert_draft_row, update_to_open, settle_bet_row, get_filtered_bets
+from schemas import DraftBet, OpenBetUpdate, SettleBet, AmendBet
+from sheets import get_user_sheet, insert_draft_row, settle_bet_row, update_to_open
+from sheets import settle_bet_row, get_filtered_bets, amend_bet_row
 
 from database import SessionLocal, init_db, TipDetail, TipMessage
 from sqlalchemy.orm import Session
@@ -82,6 +83,20 @@ async def settle_bet(settle: SettleBet, x_token: str = Header(None)):
     
     if not success:
         raise HTTPException(status_code=404, detail=message)
+        
+    return {"status": "success", "message": message}
+
+@app.patch("/bet/amend")
+async def amend_bet(update: AmendBet, x_token: str = Header(None)):
+    sheet_id = USER_SHEETS.get(x_token)
+    if not sheet_id:
+        raise HTTPException(status_code=401, detail="Invalid User Token")
+    
+    sh = get_user_sheet(sheet_id)
+    success, message = amend_bet_row(sh, update.model_dump())
+    
+    if not success:
+        raise HTTPException(status_code=400, detail=message)
         
     return {"status": "success", "message": message}
 

@@ -45,3 +45,16 @@ class SettleBet(BaseModel):
     sp: str       # Starting Price
     rule4: Optional[int] = None # Blank  if no deduction
     comment: Optional[str] = ""
+
+class AmendBet(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    ID: str
+    raceDate: Optional[str] = None     # DD/MM/YYYY
+    stakePts: Optional[float] = None
+    gbpPerPoint: Optional[float] = None # Maps to column P
+    rule4: Optional[int] = None        # Maps to column T (Use 0 or integer)
+    returnsPts: Optional[float] = None # Column AF (Overwrites formula)
+    profitPts: Optional[float] = None  # Column AG (Overwrites formula)
+    returnsGbp: Optional[float] = None # Column AH (Overwrites formula)
+    profitGbp: Optional[float] = None  # Column AI (Overwrites formula)
+    comment: Optional[str] = None      # Column AJ (Highly recommended for overrides)
