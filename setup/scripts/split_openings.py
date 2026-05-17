@@ -3,8 +3,8 @@ import json
 from pathlib import Path
 
 # CONFIGURATION
-CSV_FILE_PATH = Path("setup/historical_openings.csv")
-OUTPUT_DIRECTORY = Path("bet_placings")
+CSV_FILE_PATH = Path("setup/data/historic_openings.csv")
+OUTPUT_DIRECTORY = Path("setup/data/bet_placings")
 
 def clean_value(val: str, default: str = "") -> str:
     """Removes leading/trailing whitespaces and normalises dashes or blanks."""

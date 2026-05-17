@@ -1,15 +1,18 @@
+from dotenv import load_dotenv
+load_dotenv()  # This looks for a .env file and loads it into os.environ
+
 import os
+from pathlib import Path
 import time
 import json
 import requests
-from confidential import HEADERS
 
 # Configuration
 API_URL = "http://127.0.0.1:8000/bet/draft"
-DRAFTS_DIR = "draft_bets"
+DRAFTS_DIR = Path("setup/tmp/draft_bets")
 
-# HEADERS is defined like this in confidential.py:
-# HEADERS = {"x-token": "secret_token_1"}
+HEADERS_JSON = os.environ.get("HEADERS_CONFIG", "{}")
+HEADERS = json.loads(HEADERS_JSON)
 
 def import_drafts():
     # Get all json files in the directory

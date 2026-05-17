@@ -6,6 +6,8 @@ test_samples/
 draft_bets/
 bet_placings/
 setup/data/
+setup/tmp/
+setup/scripts/confidential.py
 session_name.session
 br_sheets.db
 
